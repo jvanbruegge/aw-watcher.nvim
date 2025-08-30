@@ -2,26 +2,21 @@ local function get_filename() return vim.fn.expand("%p") or "" end
 
 local function get_filetype() return vim.bo.filetype end
 
-local function search_git_root()
-    local root_dir
-    for dir in vim.fs.parents(vim.api.nvim_buf_get_name(0)) do
-        if vim.fn.isdirectory(dir .. "/.git") == 1 then
-            root_dir = dir
-            break
-        end
-    end
-    return root_dir
-end
-
 local function set_project_name()
-    local project = search_git_root() or vim.fn.getcwd()
-    vim.b.project_name = vim.fs.normalize(project):gsub(".*/", "")
+    if vim.b.project_name ~= nil then
+      local project = vim.fs.root(0, '.git') or vim.fn.getcwd()
+      vim.b.project_name = vim.fs.normalize(project):gsub(".*/", "")
+    end
 end
 
 local function set_branch_name()
-    local branch = vim.fn.system("git rev-parse --abbrev-ref HEAD 2>/dev/null"):gsub("\n", "")
-    vim.b.branch_name = branch == "" and "unknown" or branch
-    return vim.b.branch_name
+    if vim.b.branch_name ~= nil and not vim.b.branch_name_running then
+        vim.b.branch_name_running = true
+        vim.system({ "git", "rev-parse", "--abbrev-ref", "HEAD" }, function(res)
+          local branch = res.stdout:gsub("\n", "")
+            vim.b.branch_name = branch == "" and "unknown" or branch
+        end)
+    end
 end
 
 local has_notify, notify = pcall(require, "notify")

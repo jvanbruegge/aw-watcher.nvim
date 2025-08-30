@@ -49,13 +49,13 @@ local function create_autocommands()
 
     vim.api.nvim_create_autocmd("VimEnter", { group = augroup, callback = M.bucket_start })
 
-    vim.api.nvim_create_autocmd({ "FileType", "BufEnter", "FocusGained" }, {
-        group = augroup,
-        callback = function()
-            utils.set_branch_name()
-            utils.set_project_name()
-        end,
-    })
+    --vim.api.nvim_create_autocmd({ "FileType", "BufEnter", "FocusGained" }, {
+    --    group = augroup,
+    --    callback = function()
+    --        utils.set_branch_name()
+    --        utils.set_project_name()
+    --    end,
+    --})
 end
 
 function M.setup(opts)
